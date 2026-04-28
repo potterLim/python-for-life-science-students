@@ -251,7 +251,7 @@ print(df["Compound"].value_counts().head(10))
 
 이제 분석 범위를 줄입니다. 처음부터 모든 community, 모든 library, 모든 compound를 한꺼번에 비교하지 않고, 하나의 작은 범위에서 시작합니다.
 
-먼저 `Community == 4`이고 `Library == "PS1"`인 데이터만 골라봅니다. 이 선택은 첫 프로젝트에서 다루기 좋은 작은 범위를 만들기 위한 것입니다.
+먼저 `Community == 4`이고 `Library == "PS1"`인 데이터만 골라봅니다. 이 값이 생물학적으로 특별한 정답이라는 뜻은 아닙니다. 첫 프로젝트에서 다루기 좋은 작은 범위를 만들기 위한 예시 선택입니다.
 
 ```python
 selected_community = 4
@@ -270,7 +270,7 @@ print(candidate["Compound"].value_counts().head(20))
 
 성장 곡선을 비교하려면 기준이 되는 조건과 비교할 조건이 필요합니다. 이 데이터에서 `DMSO`는 화학물질을 녹이는 solvent 조건으로, 비교 기준 control로 사용할 수 있습니다.
 
-`empty`는 특정 compound 이름이 아니므로 이번 비교에서는 사용하지 않습니다. 비교할 treatment 조건은 처음부터 여러 개를 고르지 않고 하나만 선택합니다. 위에서 출력한 compound 목록에 있는 `HEXACHLOROPHENE`을 예시 treatment로 골라, control과 treatment의 성장 곡선을 비교해 보겠습니다.
+`empty`는 특정 compound 이름이 아니므로 이번 비교에서는 사용하지 않습니다. 비교할 treatment 조건은 처음부터 여러 개를 고르지 않고 하나만 선택합니다. 위에서 출력한 compound 목록에 있는 `HEXACHLOROPHENE`을 예시 treatment로 골라, control과 treatment의 성장 곡선을 비교해 보겠습니다. 핵심은 이 화학물질 자체가 아니라, control과 treatment를 골라 성장 곡선을 비교하는 흐름입니다.
 
 이제 비교 대상을 이렇게 정리할 수 있습니다.
 
