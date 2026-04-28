@@ -1,0 +1,27 @@
+# Python 빠른 준비
+
+Python을 제대로 배우는 데에는 이미 좋은 강의, 책, 문서, 영상 자료가 많이 있습니다. 시간이 충분하다면 그런 자료를 통해 차근차근 배우는 편이 더 좋습니다.
+
+이 디렉토리는 그 자료들을 대신하려는 곳이 아닙니다. 생명과학 데이터 실습을 빠르게 따라가고 싶은 사람이, 코드를 읽고 필요한 부분을 조금 고칠 수 있을 정도의 Python 감각을 만드는 짧은 준비 과정입니다.
+
+그래서 설명은 프로그래밍 언어로서의 엄밀성을 끝까지 밀어붙이기보다, 처음 보는 코드가 무엇을 하려는지 이해하고 실제 작업에 활용할 수 있게 하는 쪽을 선택했습니다. 정확한 개념 정의가 필요한 부분은 나중에 더 깊은 자료로 보완하면 됩니다. 여기서는 변수, 리스트, 조건문, 반복문처럼 실제 데이터 정리와 분석 코드에서 자주 마주치는 표현에 먼저 익숙해지는 것이 중요합니다.
+
+## 학습 순서
+
+1. [값, 변수, 자료형](https://colab.research.google.com/github/potterLim/why-learn-python/blob/main/python/01_values_variables_types.ipynb)
+2. [리스트와 딕셔너리](https://colab.research.google.com/github/potterLim/why-learn-python/blob/main/python/02_lists_dictionaries.ipynb)
+3. [조건문과 반복문](https://colab.research.google.com/github/potterLim/why-learn-python/blob/main/python/03_conditions_loops.ipynb)
+4. [함수와 import](https://colab.research.google.com/github/potterLim/why-learn-python/blob/main/python/04_functions_imports.ipynb)
+5. [에러 메시지 읽기와 코드 읽기 연습](https://colab.research.google.com/github/potterLim/why-learn-python/blob/main/python/05_errors_and_code_reading.ipynb)
+
+## 권장 방식
+
+순서대로 열어보고, 코드 셀은 직접 실행해 보세요. 설명을 모두 외우려고 하기보다 “이 코드가 어떤 값을 만들고, 어떤 기준으로 나누고, 어떤 결과를 출력하는지”를 따라가는 데 집중하면 됩니다.
+
+각 파일의 마지막에는 값을 조금 바꿔보는 연습이 있습니다. 숫자, 문자열, 기준값을 바꿔 실행해 보면 코드가 어떻게 반응하는지 더 쉽게 감이 잡힙니다.
+
+## 여기서 다루지 않는 것
+
+데이터를 분류하고, 그래프를 그리고, 실제 분석 도구를 본격적으로 사용하는 방법까지는 여기서 다루지 않습니다. 이 디렉토리에서는 그런 도구를 사용하기 전에 필요한 최소한의 언어 감각만 준비합니다.
+
+전문적인 개발 지식도 의도적으로 깊게 다루지 않습니다. 목표는 전문 개발자가 되는 것이 아니라, 생명과학 데이터를 다루는 과정에서 Python을 편리한 도구로 사용할 수 있게 되는 것입니다.
