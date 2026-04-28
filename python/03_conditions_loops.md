@@ -88,7 +88,7 @@ else:
 
 ```text
 0.4 이상          -> high
-0.2 이상 0.4 미만 -> medium
+0.2 이상 0.4 미만  -> medium
 0.2 미만          -> low
 ```
 
