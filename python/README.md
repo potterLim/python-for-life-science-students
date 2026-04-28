@@ -8,17 +8,17 @@ Python을 제대로 배우는 데에는 이미 좋은 강의, 책, 문서, 영�
 
 ## 학습 순서
 
-1. [값, 변수, 자료형](https://colab.research.google.com/github/potterLim/why-learn-python/blob/main/python/01_values_variables_types.ipynb)
-2. [리스트와 딕셔너리](https://colab.research.google.com/github/potterLim/why-learn-python/blob/main/python/02_lists_dictionaries.ipynb)
-3. [조건문과 반복문](https://colab.research.google.com/github/potterLim/why-learn-python/blob/main/python/03_conditions_loops.ipynb)
-4. [함수와 import](https://colab.research.google.com/github/potterLim/why-learn-python/blob/main/python/04_functions_imports.ipynb)
-5. [에러 메시지 읽기와 코드 읽기 연습](https://colab.research.google.com/github/potterLim/why-learn-python/blob/main/python/05_errors_and_code_reading.ipynb)
+1. [값, 변수, 자료형](01_values_variables_types.md)
+2. [리스트와 딕셔너리](02_lists_dictionaries.md)
+3. [조건문과 반복문](03_conditions_loops.md)
+4. [함수와 import](04_functions_imports.md)
+5. [에러 메시지 읽기와 코드 읽기 연습](05_errors_and_code_reading.md)
 
 ## 권장 방식
 
-순서대로 열어보고, 코드 셀은 직접 실행해 보세요. 설명을 모두 외우려고 하기보다 “이 코드가 어떤 값을 만들고, 어떤 기준으로 나누고, 어떤 결과를 출력하는지”를 따라가는 데 집중하면 됩니다.
+순서대로 문서를 읽고, 각 문서에서 안내하는 `.py` 파일을 직접 만들어 보세요. 코드를 복사해서 한 번에 붙여넣기보다, 단계별로 직접 입력하고 실행해 보는 편이 좋습니다.
 
-각 파일의 마지막에는 값을 조금 바꿔보는 연습이 있습니다. 숫자, 문자열, 기준값을 바꿔 실행해 보면 코드가 어떻게 반응하는지 더 쉽게 감이 잡힙니다.
+설명을 모두 외우려고 하기보다 “이 코드가 어떤 값을 만들고, 어떤 기준으로 나누고, 어떤 결과를 출력하는지”를 따라가는 데 집중하면 됩니다. 각 파일의 마지막에는 값을 조금 바꿔보는 연습이 있습니다. 숫자, 문자열, 기준값을 바꿔 실행해 보면 코드가 어떻게 반응하는지 더 쉽게 감이 잡힙니다.
 
 ## 여기서 다루지 않는 것
 
