@@ -45,7 +45,6 @@
 5. YOLO로 현미경 이미지 속 세포핵 탐지하기  
    mask에서 nucleus 위치를 bounding box로 바꾸어 YOLO 학습용 label을 만들고, 작은 object detection 모델을 학습한 뒤 예측된 nucleus 수를 실제 mask 기준과 비교합니다.
 
-
 이 과정에서 Python은 복잡한 프로그래밍 언어라기보다, 실험 데이터의 모양을 바꾸고 필요한 결과를 만들어내는 도구로 다가오게 됩니다.
 
 ## 프로젝트별 데이터
