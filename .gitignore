@@ -60,14 +60,23 @@ ENV/
 
 # Notebook and script outputs
 outputs/
+**/outputs/
 results/
+**/results/
 figures/
+**/figures/
 reports/
+**/reports/
 
 # Downloaded datasets and large local artifacts
 data/raw/
+**/data/raw/
 data/interim/
+**/data/interim/
 data/processed/
+**/data/processed/
+data/yolo_dataset/
+**/data/yolo_dataset/
 datasets/
 
 # Machine learning / YOLO artifacts
