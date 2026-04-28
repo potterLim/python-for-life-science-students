@@ -135,6 +135,8 @@ print(f"파일 크기: {file_size_mb:.1f} MB")
 
 ## 4단계. CSV 파일 불러오기
 
+데이터 파일을 받았으니 가장 먼저 할 일은 파일을 Python 안으로 불러와서 모양을 확인하는 것입니다. 아직 어떤 열이 있는지, 행이 얼마나 많은지, 값이 어떤 식으로 들어 있는지 모릅니다.
+
 CSV는 comma-separated values의 줄임말입니다. 이름 그대로 쉼표로 열을 구분한 표 형식의 파일입니다.
 
 엑셀 파일처럼 행과 열이 있다고 생각하면 됩니다. 다만 CSV는 서식, 색깔, 여러 시트 같은 정보 없이 값만 저장하는 단순한 표 파일입니다.
@@ -162,13 +164,19 @@ print(df.head())
 
 ## 5단계. 열 이름과 주요 열 확인하기
 
-열 이름만 따로 확인해 봅니다.
+데이터의 전체 크기를 확인했으니, 이제 어떤 열이 있는지 봅니다.
 
 ```python
 print(df.columns.tolist())
 ```
 
-앞으로 자주 사용할 열은 다음과 같습니다.
+성장 곡선을 그리려면 최소한 두 가지 정보가 필요합니다.
+
+첫째, 시간이 필요합니다. 세균이 시간이 지나면서 어떻게 변하는지 보려는 것이므로 시간은 그래프의 x축이 됩니다.
+
+둘째, 성장 정도를 나타내는 값이 필요합니다. 이 데이터에서는 `OD600`이 그 역할을 하므로 그래프의 y축이 됩니다.
+
+다른 열들은 어떤 community인지, 어떤 화학물질을 처리했는지, 어떤 well에서 측정했는지를 알려줍니다. 즉, 나중에 비교할 조건을 고를 때 필요합니다.
 
 | 열 이름 | 의미 |
 | --- | --- |
@@ -185,16 +193,9 @@ print(df.columns.tolist())
 
 ## 6단계. CSV에서 열을 꺼내 그래프로 저장하기
 
-그래프를 그리려면 결국 x축에 넣을 값과 y축에 넣을 값이 필요합니다.
+이제 정말 그래프를 그릴 수 있는지 아주 작은 예시로 확인해 봅니다. 처음부터 22만 개가 넘는 행을 전부 그리면 복잡하므로, 앞 5개 행에서 `Time`과 `OD600`만 꺼내 보겠습니다.
 
-이 데이터에서는 다음처럼 생각할 수 있습니다.
-
-```text
-x축: Time
-y축: OD600
-```
-
-먼저 데이터의 앞 5개 값만 꺼내 작은 그래프로 저장해 봅니다.
+여기서 x축은 `Time`입니다. 우리가 궁금한 것은 시간이 지나면서 값이 어떻게 변하는지이기 때문입니다. y축은 `OD600`입니다. 시간에 따라 변하는 관찰값이 OD600이기 때문입니다.
 
 ```python
 preview = df[["Time", "OD600"]].head(5)
@@ -233,7 +234,7 @@ df[["Time", "OD600"]]
 
 ## 7단계. 데이터 전체를 가볍게 살펴보기
 
-본격적인 분석 전에 데이터의 범위와 구조를 확인합니다.
+작은 그래프를 저장해 봤으니, 이제 전체 데이터가 어떤 범위를 가지고 있는지 확인합니다. 여기서는 시간 범위, OD600 범위, community 목록, 자주 등장하는 compound를 확인합니다.
 
 ```python
 print("Time 범위:", df["Time"].min(), "~", df["Time"].max())
@@ -244,30 +245,45 @@ print(df["Compound"].value_counts().head(10))
 
 이 데이터는 대략 0시간부터 72시간까지의 성장 곡선을 포함합니다.
 
-`DMSO`가 많이 등장합니다. 이 데이터셋에서 DMSO는 화학물질을 녹이는 solvent 조건으로, 비교 기준 control로 사용할 수 있습니다.
+`Community`가 여러 개 있고, `Compound`도 매우 많습니다. 따라서 전체 데이터를 한 번에 비교하려고 하면 첫 프로젝트에서 다루기 어렵습니다. 다음 단계에서는 먼저 하나의 community와 하나의 library만 고른 뒤, 그 안에 어떤 compound가 있는지 확인해 보겠습니다.
 
 ## 8단계. 분석할 작은 데이터만 고르기
 
-전체 데이터를 한 번에 다루려고 하면 처음에는 복잡합니다. 먼저 작은 부분만 골라서 같은 흐름을 따라가 봅니다.
+이제 분석 범위를 줄입니다. 처음부터 모든 community, 모든 library, 모든 compound를 한꺼번에 비교하지 않고, 하나의 작은 범위에서 시작합니다.
 
-여기서는 다음 조건만 사용합니다.
-
-- `Community == 4`
-- `Library == "PS1"`
-- `Compound`는 `DMSO`와 `HEXACHLOROPHENE`만 사용
-
-`DMSO`는 control 조건이고, `HEXACHLOROPHENE`은 DMSO와 비교할 treatment 조건으로 사용합니다.
+먼저 `Community == 4`이고 `Library == "PS1"`인 데이터만 골라봅니다. 이 선택은 첫 프로젝트에서 다루기 좋은 작은 범위를 만들기 위한 것입니다.
 
 ```python
 selected_community = 4
 selected_library = "PS1"
-selected_compounds = ["DMSO", "HEXACHLOROPHENE"]
 
-subset = df[
+candidate = df[
     (df["Community"] == selected_community)
     & (df["Library"] == selected_library)
-    & (df["Compound"].isin(selected_compounds))
 ].copy()
+
+print("Community 4, PS1 데이터 크기:", candidate.shape)
+print(candidate["Compound"].value_counts().head(20))
+```
+
+이제 이 작은 범위 안에 어떤 compound가 있는지 확인할 수 있습니다. 출력 결과를 보면 `DMSO`, `empty`, 그리고 여러 화학물질 이름이 함께 나타납니다.
+
+성장 곡선을 비교하려면 기준이 되는 조건과 비교할 조건이 필요합니다. 이 데이터에서 `DMSO`는 화학물질을 녹이는 solvent 조건으로, 비교 기준 control로 사용할 수 있습니다.
+
+`empty`는 특정 compound 이름이 아니므로 이번 비교에서는 사용하지 않습니다. 비교할 treatment 조건은 처음부터 여러 개를 고르지 않고 하나만 선택합니다. 위에서 출력한 compound 목록에 있는 `HEXACHLOROPHENE`을 예시 treatment로 골라, control과 treatment의 성장 곡선을 비교해 보겠습니다.
+
+이제 비교 대상을 이렇게 정리할 수 있습니다.
+
+> Community 4, PS1 library에서 DMSO 조건과 HEXACHLOROPHENE 처리 조건의 성장 곡선은 어떻게 다를까?
+
+이 비교를 하려면 `candidate`에서 두 compound에 해당하는 행만 남기면 됩니다.
+
+따라서 이번 비교에 사용할 compound는 `DMSO`와 `HEXACHLOROPHENE` 두 개입니다.
+
+```python
+selected_compounds = ["DMSO", "HEXACHLOROPHENE"]
+
+subset = candidate[candidate["Compound"].isin(selected_compounds)].copy()
 
 print("선택한 데이터 크기:", subset.shape)
 print(subset[["Time", "OD600", "Community", "Library", "Rep", "Well", "Compound"]].head())
@@ -276,9 +292,13 @@ print(subset["Compound"].value_counts())
 
 위 코드는 조건에 맞는 행만 골라 `subset`이라는 새 DataFrame을 만듭니다.
 
-세 조건 사이의 `&`는 “그리고”라는 뜻입니다. 즉, 세 조건을 모두 만족하는 행만 남깁니다.
+`isin(selected_compounds)`는 `Compound` 값이 `selected_compounds` 안에 들어 있는지 확인합니다. 여기서는 compound가 DMSO 또는 HEXACHLOROPHENE인 행만 남깁니다.
+
+이 단계가 중요한 이유는 비교하고 싶은 조건을 코드로 표현하는 첫 순간이기 때문입니다. “무엇을 비교할 것인가”가 정해지면, 그에 맞는 행만 고르는 작업이 필요합니다.
 
 ## 9단계. 한 조건의 원자료 성장 곡선 그리기
+
+조건을 골랐으니 바로 평균을 내기보다, 먼저 원자료가 어떤 모양인지 봅니다. 평균 곡선만 보면 깔끔하지만, 실제 측정값이 얼마나 많이 찍혀 있는지, 같은 시간대에 값이 얼마나 겹치는지는 잘 보이지 않습니다.
 
 먼저 control인 `DMSO` 데이터만 골라서 시간에 따른 OD600을 점으로 그대로 그립니다.
 
@@ -321,7 +341,9 @@ x축에 들어갈 `dmso_time`과 y축에 들어갈 `dmso_od`의 길이가 같아
 
 ## 10단계. 시간별 평균 성장 곡선 만들기
 
-원자료를 그대로 그리면 점이 너무 많습니다. 그래서 같은 시간과 같은 compound에 해당하는 OD600 값을 평균 내서 더 보기 쉬운 성장 곡선을 만듭니다.
+원자료를 확인해 보니 같은 조건에서도 점이 많이 찍혀 있습니다. 이것은 여러 well과 반복 측정이 들어 있기 때문입니다.
+
+우리가 지금 보고 싶은 것은 각 점 하나하나가 아니라, DMSO와 HEXACHLOROPHENE의 전반적인 성장 흐름입니다. 그래서 같은 시간과 같은 compound에 해당하는 OD600 값을 평균 내서 더 보기 쉬운 성장 곡선을 만듭니다.
 
 먼저 시간 값을 반올림합니다.
 
@@ -332,7 +354,7 @@ print(subset[["Time", "Time_rounded"]].head())
 
 실제 시간 값은 `1.00138888888889`처럼 아주 작은 오차를 포함합니다. 이런 값은 그래프에서는 사실상 1시간으로 보아도 충분합니다. 그래서 `round()`로 시간 값을 0, 1, 2, 3처럼 정리합니다.
 
-이제 compound와 시간별로 평균 OD600을 계산합니다.
+시간을 정리했으니 이제 compound와 시간별로 평균 OD600을 계산합니다.
 
 ```python
 mean_curve = (
@@ -362,7 +384,9 @@ HEXACHLOROPHENE, 1시간
 
 ## 11단계. Control과 treatment 성장 곡선 비교하기
 
-이제 DMSO와 HEXACHLOROPHENE의 평균 성장 곡선을 같은 그래프에 그립니다.
+이제 앞에서 정한 비교 대상으로 돌아옵니다. DMSO 조건과 HEXACHLOROPHENE 조건의 성장 흐름을 비교하려면 두 평균 성장 곡선을 같은 그래프에 올려야 합니다.
+
+여기서도 x축은 시간이고, y축은 평균 OD600입니다. 원자료의 OD600이 아니라 평균 OD600을 쓰는 이유는 조건별 성장 흐름을 더 명확하게 보기 위해서입니다.
 
 ```python
 plt.figure(figsize=(8, 5))
@@ -406,9 +430,9 @@ print("저장된 파일:", growth_curve_path)
 
 ## 12단계. 최대 OD600과 마지막 OD600 계산하기
 
-그래프는 직관적이지만, 숫자로도 요약해보면 좋습니다.
+그래프를 보면 두 조건의 성장 흐름을 눈으로 비교할 수 있습니다. 하지만 결과를 파일로 정리하거나 다른 조건과 비교하려면 숫자 요약도 필요합니다.
 
-먼저 각 조건에서 가장 높은 평균 OD600 값을 계산합니다.
+먼저 각 조건에서 가장 높은 평균 OD600 값과 마지막 시간대의 평균 OD600 값을 계산합니다.
 
 ```python
 max_od = (
@@ -437,16 +461,13 @@ print(summary)
 
 ## 13단계. AUC 계산하기
 
-성장 곡선을 숫자 하나로 요약하는 방법 중 하나가 AUC입니다. AUC는 area under the curve의 줄임말로, 곡선 아래 면적을 뜻합니다.
+최대 OD600과 마지막 OD600은 유용하지만, 성장 곡선 전체를 모두 반영하지는 않습니다. 예를 들어 어떤 조건은 초반에 빠르게 자라다가 멈출 수 있고, 다른 조건은 천천히 자라지만 오래 유지될 수도 있습니다.
 
-여기서는 AUC를 다음처럼 이해하면 충분합니다.
+그래서 성장 곡선 전체를 하나의 숫자로 요약하는 방법도 사용해 봅니다. 그중 하나가 AUC입니다. AUC는 area under the curve의 줄임말로, 곡선 아래 면적을 뜻합니다.
 
-```text
-AUC가 크다 -> 전체 시간 동안 OD600이 비교적 높았다
-AUC가 작다 -> 전체 시간 동안 OD600이 비교적 낮았다
-```
+여기서는 AUC가 클수록 전체 시간 동안 OD600이 비교적 높은 수준으로 유지되었다고 이해하면 충분합니다. 반대로 AUC가 작다면 전체 시간 동안 OD600이 비교적 낮은 수준이었다고 볼 수 있습니다.
 
-즉, AUC는 “전체 성장량을 거칠게 요약한 값”으로 사용할 수 있습니다.
+즉, AUC는 “전체 시간 동안 OD600이 어느 정도 수준으로 유지되었는지”를 거칠게 요약한 값으로 사용할 수 있습니다.
 
 ```python
 def calculate_auc(curve):
@@ -487,7 +508,9 @@ print(summary)
 
 ## 14단계. 요약표와 AUC 그래프 저장하기
 
-요약표를 CSV 파일로 저장합니다.
+지금까지 그래프를 그리고, 평균 곡선을 만들고, 여러 숫자 요약값을 계산했습니다. 마지막으로 이 결과를 파일로 저장합니다. 그래야 나중에 다시 열어볼 수 있고, 다른 도구에서 확인할 수도 있습니다.
+
+먼저 요약표를 CSV 파일로 저장합니다.
 
 ```python
 summary_path = OUTPUT_DIR / "growth_summary.csv"
@@ -502,7 +525,7 @@ print(pd.read_csv(summary_path))
 - `summary_path`: 저장할 파일 경로입니다.
 - `index=False`: 행 번호를 CSV 파일에 따로 저장하지 않겠다는 뜻입니다.
 
-이제 조건별 AUC를 막대그래프로 비교합니다.
+이제 조건별 AUC를 막대그래프로 저장합니다. 여기서는 x축에 compound 이름을 두고, y축에 AUC 값을 둡니다.
 
 ```python
 compound_names = summary["Compound"].tolist()
@@ -535,7 +558,7 @@ x축: compound_names
 y축: auc_values
 ```
 
-즉, CSV에서 시작한 데이터가 DataFrame으로 들어오고, 필요한 열이 리스트로 바뀐 뒤, 그 리스트가 그래프의 x축과 y축으로 사용되는 흐름을 다시 한 번 확인할 수 있습니다.
+즉, 처음에는 파일 안에 있던 표 데이터가 `DataFrame`으로 들어왔고, 그 안에서 필요한 열과 조건을 고른 뒤, 그래프와 요약표라는 결과 파일로 바뀌었습니다.
 
 ## 최종적으로 만들어지는 파일
 
@@ -603,7 +626,7 @@ print(
 
 ## 이 프로젝트에서 해본 것
 
-실제 생명과학 실험 데이터로 다음 흐름을 따라갔습니다.
+실제 생명과학 실험 데이터로 다음 흐름을 따라갔습니다. 핵심은 데이터를 열어보고 필요한 열과 조건을 하나씩 정하면서 성장 곡선 분석을 완성했다는 점입니다.
 
 1. 표 형태의 실험 데이터 읽기
 2. 시간과 OD600 열 확인하기
