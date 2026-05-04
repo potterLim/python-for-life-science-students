@@ -25,7 +25,7 @@
 | 1 | [세균 성장 곡선 분석하기](01_bacterial_growth_curve.md) |
 | 2 | [RNA-seq 발현 데이터로 유전자 발현 패턴 보기](02_rnaseq_expression_patterns.md) |
 | 3 | [GenBank 파일로 바이러스 유전체 구조 살펴보기](03_genbank_viral_genome.md) |
-| 4 | ~~현미경 이미지에서 세포핵 측정하기~~ |
+| 4 | [현미경 이미지에서 세포핵 측정하기](04_microscopy_nuclei_measurement.md) |
 | 5 | ~~YOLO로 현미경 이미지 속 세포핵 탐지하기~~ |
 
 ## 프로젝트별 핵심
