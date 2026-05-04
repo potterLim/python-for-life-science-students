@@ -29,7 +29,7 @@ Python을 엑셀이나 계산기처럼 필요한 일을 처리하는 도구로 �
 | 2 | [RNA-seq 발현 데이터로 유전자 발현 패턴 보기](projects/02_rnaseq_expression_patterns.md) |
 | 3 | [GenBank 파일로 바이러스 유전체 구조 살펴보기](projects/03_genbank_viral_genome.md) |
 | 4 | [현미경 이미지에서 세포핵 측정하기](projects/04_microscopy_nuclei_measurement.md) |
-| 5 | ~~YOLO로 현미경 이미지 속 세포핵 탐지하기~~ |
+| 5 | [YOLO로 현미경 이미지 속 세포핵 탐지하기](projects/05_yolo_nuclei_detection.md) |
 
 프로젝트의 자세한 설명은 [프로젝트 안내](projects/README.md)에서 확인할 수 있습니다.
 
@@ -45,4 +45,4 @@ Python 3.11 이상 사용을 권장합니다. 대부분의 실습은 일반적�
 
 오류나 개선 제안은 `potterLim0808@gmail.com`으로 알려주세요.
 
-마지막 수정: 2026.05.04.
+마지막 수정: 2026. 05. 04.
