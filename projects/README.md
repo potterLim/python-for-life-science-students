@@ -43,7 +43,7 @@
    현미경 이미지를 숫자 배열로 읽고, mask와 label image를 이용해 nucleus의 면적, 밝기, 중심 좌표, bounding box를 측정합니다.
 
 5. YOLO로 현미경 이미지 속 세포핵 탐지하기  
-   mask에서 nucleus 위치를 bounding box로 바꾸어 YOLO 학습용 label을 만들고, 작은 object detection 모델을 학습한 뒤 예측된 nucleus 수를 실제 mask 기준과 비교합니다.
+   mask에서 nucleus 위치를 bounding box로 바꾸어 YOLO 학습용 label을 만들고, 작은 object detection 모델을 학습한 뒤 예측된 nucleus 수를 mask 기반 ground truth와 비교합니다.
 
 이 과정에서 Python은 복잡한 프로그래밍 언어라기보다, 실험 데이터의 모양을 바꾸고 필요한 결과를 만들어내는 도구로 다가오게 됩니다.
 
@@ -54,8 +54,8 @@
 | 1 | [Bacterial bioindicators growth curves](https://figshare.com/articles/dataset/Bacterial_bioindicators_growth_curves/28684982) | bacterial growth curve CSV |
 | 2 | [GSE60450](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE60450) | RNA-seq normalized count CSV, metadata CSV |
 | 3 | [NCBI Nucleotide NC_045512.2](https://www.ncbi.nlm.nih.gov/nuccore/1798174254) | GenBank, FASTA |
-| 4 | [BBBC039](https://bbbc.broadinstitute.org/BBBC039/) | microscopy TIFF image, PNG mask |
-| 5 | [BBBC039](https://bbbc.broadinstitute.org/BBBC039/) | microscopy image, mask, YOLO label |
+| 4 | [BBBC039](https://bbbc.broadinstitute.org/BBBC039/) | 현미경 TIFF 이미지, PNG mask |
+| 5 | [BBBC039](https://bbbc.broadinstitute.org/BBBC039/) | 현미경 이미지, mask, YOLO label |
 
 ## 권장 학습 방식
 
