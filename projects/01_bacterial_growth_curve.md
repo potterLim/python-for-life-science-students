@@ -581,6 +581,10 @@ projects/01_bacterial_growth_curve/outputs/
 | `growth_auc_comparison.png` | 두 조건의 AUC 막대그래프 |
 | `growth_summary.csv` | 최대 OD600, 마지막 OD600, AUC 요약표 |
 
+## 완성 참고 코드
+
+완성된 참고 코드는 [프로젝트 1 완성 참고 코드](reference_code/01_bacterial_growth_curve.py)에서 확인할 수 있습니다. 먼저 문서를 따라 직접 입력해 보고, 실행이 잘 되지 않거나 전체 구조를 비교하고 싶을 때 참고하는 것을 권장합니다.
+
 ## 자주 생기는 문제
 
 ### `ModuleNotFoundError`가 뜨는 경우

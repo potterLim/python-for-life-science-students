@@ -633,6 +633,10 @@ projects/03_genbank_viral_genome/outputs/
 | `spike_protein.fasta` | spike protein sequence |
 | `spike_motif_positions.csv` | spike protein에서 찾은 motif 위치 |
 
+## 완성 참고 코드
+
+완성된 참고 코드는 [프로젝트 3 완성 참고 코드](reference_code/03_genbank_viral_genome.py)에서 확인할 수 있습니다. 먼저 문서를 따라 직접 입력해 보고, 실행이 잘 되지 않거나 전체 구조를 비교하고 싶을 때 참고하는 것을 권장합니다.
+
 ## 자주 생기는 문제
 
 ### `ModuleNotFoundError: No module named 'Bio'`가 뜨는 경우

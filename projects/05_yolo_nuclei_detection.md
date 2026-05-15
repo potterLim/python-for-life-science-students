@@ -1000,6 +1000,10 @@ projects/05_yolo_nuclei_detection/
 | `count_comparison.csv` | 실제 nucleus 수와 예측 nucleus 수 비교표 |
 | `count_comparison.png` | 실제 nucleus 수와 예측 nucleus 수 비교 그래프 |
 
+## 완성 참고 코드
+
+완성된 참고 코드는 [프로젝트 5 완성 참고 코드](reference_code/05_yolo_nuclei_detection.py)에서 확인할 수 있습니다. 이 참고 코드는 예측 결과가 눈에 보일 정도로 학습되도록 문서의 기본 시작값보다 긴 학습 설정을 사용합니다. 먼저 문서를 따라 직접 입력해 보고, 실행이 잘 되지 않거나 전체 구조를 비교하고 싶을 때 참고하는 것을 권장합니다.
+
 ## 자주 생기는 문제
 
 ### `ModuleNotFoundError: No module named 'ultralytics'`가 뜨는 경우

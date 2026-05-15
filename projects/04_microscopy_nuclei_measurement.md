@@ -730,6 +730,10 @@ projects/04_microscopy_nuclei_measurement/outputs/
 | `nuclei_measurements.csv` | nucleus별 면적, 밝기, 중심 좌표, bounding box |
 | `image_summary.csv` | 이미지별 nucleus 개수와 평균 측정값 |
 
+## 완성 참고 코드
+
+완성된 참고 코드는 [프로젝트 4 완성 참고 코드](reference_code/04_microscopy_nuclei_measurement.py)에서 확인할 수 있습니다. 먼저 문서를 따라 직접 입력해 보고, 실행이 잘 되지 않거나 전체 구조를 비교하고 싶을 때 참고하는 것을 권장합니다.
+
 ## 자주 생기는 문제
 
 ### `ModuleNotFoundError: No module named 'skimage'`가 뜨는 경우
