@@ -1,13 +1,13 @@
 # 프로젝트 5. YOLO로 현미경 이미지 속 세포핵 탐지하기
 
-실제 공개 현미경 이미지와 nucleus mask를 사용해, YOLO object detection 모델이 학습할 수 있는 데이터셋을 만들고 작은 탐지 모델을 학습합니다.
+실제 공개 현미경 이미지와 nucleus mask를 사용해 YOLO object detection 모델이 학습할 수 있는 데이터셋을 만들고 작은 탐지 모델을 학습합니다.
 
 전체 흐름은 다음과 같습니다.
 
-1. 실행 환경을 확인하고, 필요한 YOLO 파라미터를 찾아봅니다.
+1. 실행 환경을 확인하고 필요한 YOLO 파라미터를 찾아봅니다.
 2. 현미경 이미지와 mask를 YOLO 학습용 데이터셋으로 바꿉니다.
 3. 작은 object detection 모델을 짧게 학습합니다.
-4. 예측 결과를 확인하고, 실제 mask 기준과 간단히 비교합니다.
+4. 예측 결과를 확인하고 실제 mask 기준과 간단히 비교합니다.
 
 이 프로젝트를 마치면 YOLO 학습용 이미지와 label 파일, dataset YAML 파일, 학습 결과 폴더, 예측 이미지, 개수 비교 CSV와 그래프가 만들어집니다.
 
@@ -26,13 +26,15 @@
 
 프로젝트 4에서 사용한 데이터셋과 같습니다. 다만 이번에는 목적이 조금 다릅니다. YOLO는 mask 이미지를 그대로 학습하지 않고, 이미지와 bounding box label을 짝으로 받아 object detection을 학습합니다.
 
-그래서 원본 TIFF 이미지는 YOLO가 다루기 쉬운 PNG 이미지로 바꾸고, nucleus mask에서는 각 nucleus를 감싸는 bounding box를 계산해 YOLO label 파일로 저장합니다. 그다음 작은 모델을 짧게 학습해 validation 이미지에서 nucleus를 탐지해 봅니다.
+그래서 원본 TIFF 이미지는 YOLO가 다루기 쉬운 PNG 이미지로 바꾸고 nucleus mask에서는 각 nucleus를 감싸는 bounding box를 계산해 YOLO label 파일로 저장합니다.  
+그다음 작은 모델을 짧게 학습해 validation 이미지에서 nucleus를 탐지해 봅니다.
 
-이 프로젝트에서 YOLO는 이미지 안에서 nucleus가 있을 만한 위치를 사각형으로 찾아내는 도구로 사용합니다. 모델 구조를 직접 만들지는 않습니다. 대신 현미경 이미지와 bounding box label을 준비해서, 이미 만들어진 YOLO 모델이 이 데이터셋에 맞게 nucleus를 찾도록 짧게 학습시킵니다.
+이 프로젝트에서 YOLO는 이미지 안에서 nucleus가 있을 만한 위치를 사각형으로 찾아내는 도구로 사용합니다. 모델 구조를 직접 만들지는 않습니다.  
+대신 현미경 이미지와 bounding box label을 준비해서 이미 만들어진 YOLO 모델이 이 데이터셋에 맞게 nucleus를 찾도록 짧게 학습시킵니다.
 
 ## 참고할 공식 문서
 
-YOLO는 파라미터가 많습니다. 이 프로젝트에서는 모든 파라미터를 외우는 것이 아니라, 필요한 파라미터를 공식 문서에서 찾아 적용하는 연습도 함께 합니다.
+YOLO는 파라미터가 많습니다. 이 프로젝트에서는 모든 파라미터를 외우는 것이 아니라 필요한 파라미터를 공식 문서에서 찾아 적용하는 연습도 함께 합니다.
 
 주로 볼 공식 문서는 세 곳입니다.
 
@@ -40,7 +42,7 @@ YOLO는 파라미터가 많습니다. 이 프로젝트에서는 모든 파라미
 | --- | --- |
 | [Ultralytics Train Docs](https://docs.ultralytics.com/modes/train/) | `epochs`, `imgsz`, `batch`, `device`, `workers`, `project`, `name` 같은 학습 파라미터를 확인할 때 |
 | [Ultralytics Detection Dataset Docs](https://docs.ultralytics.com/datasets/detect/) | dataset YAML 구조와 YOLO label 형식을 확인할 때 |
-| [Ultralytics Predict Docs](https://docs.ultralytics.com/modes/predict/) | 예측 결과, bounding box, confidence score를 다룰 때 |
+| [Ultralytics Predict Docs](https://docs.ultralytics.com/modes/predict/) | 예측 결과와 bounding box, confidence score를 다룰 때 |
 
 공식 문서에서 원하는 파라미터를 찾을 때는 페이지 검색을 사용하면 됩니다.
 
@@ -116,9 +118,11 @@ train images: 40
 val images: 10
 ```
 
-이 값들은 성능을 가장 좋게 내기 위한 값이 아닙니다. 처음 실행했을 때 비교적 덜 막히고, 결과까지 확인하기 위한 출발값입니다. train 이미지 40장과 validation 이미지 10장도 좋은 모델을 만들기 위한 충분한 데이터 수가 아니라, 전체 흐름을 개인 컴퓨터에서 끝까지 확인하기 위한 작은 실습용 크기입니다.
+이 값들은 성능을 가장 좋게 내기 위한 값이 아닙니다. 처음 실행했을 때 비교적 덜 막히고 결과까지 확인하기 위한 출발값입니다.  
+train 이미지 40장과 validation 이미지 10장도 좋은 모델을 만들기 위한 충분한 데이터 수가 아니라 전체 흐름을 개인 컴퓨터에서 끝까지 확인하기 위한 작은 실습용 크기입니다.
 
-파라미터는 정답을 외우는 값이 아니라, 내 컴퓨터 환경과 실습 목적에 맞게 조절하는 값입니다. 처음에는 문서의 기본값으로 실행하고, 전체 흐름이 끝까지 돌아간 뒤 하나씩 바꿔 보는 편이 좋습니다. 작성자가 실제로 바꾸어 실행한 값은 2단계에서 함께 설명합니다.
+파라미터는 정답을 외우는 값이 아니라 내 컴퓨터 환경과 실습 목적에 맞게 조절하는 값입니다. 처음에는 문서의 기본값으로 실행하고 전체 흐름이 끝까지 돌아간 뒤 하나씩 바꿔 보는 편이 좋습니다.  
+작성자가 실제로 바꾸어 실행한 값은 2단계에서 함께 설명합니다.
 
 각 파라미터의 의미는 다음과 같습니다.
 
@@ -266,7 +270,7 @@ BATCH_SIZE
 
 ## 3단계. 데이터 다운로드하기
 
-BBBC039에서 이미지, mask, metadata ZIP 파일을 다운로드합니다. 프로젝트 4와 같은 데이터셋을 사용하지만, 이번에는 YOLO 학습용 데이터셋을 새로 만드는 데 사용합니다.
+BBBC039에서 이미지, mask, metadata ZIP 파일을 다운로드합니다. 프로젝트 4와 같은 데이터셋을 사용하지만 이번에는 YOLO 학습용 데이터셋을 새로 만드는 데 사용합니다.
 
 ```python
 DOWNLOADS = {
@@ -367,13 +371,14 @@ print("첫 번째 train mask:", train_mask_names[0])
 print("첫 번째 val mask:", val_mask_names[0])
 ```
 
-BBBC039 metadata는 train, validation, test 목록을 제공합니다. 여기서는 그 목록을 그대로 사용하되, 실행 시간을 줄이기 위해 앞에서 정한 개수만 선택합니다.
+BBBC039 metadata는 train, validation, test 목록을 제공합니다. 여기서는 그 목록을 그대로 사용하되 실행 시간을 줄이기 위해 앞에서 정한 개수만 선택합니다.
 
 ## 6단계. mask를 label image로 바꾸는 함수 만들기
 
 mask는 nucleus 영역을 색으로 표시한 PNG 이미지입니다. 하지만 bounding box를 계산하려면 먼저 nucleus 하나하나를 숫자 label로 구분해야 합니다.
 
-이 단계가 조금 낯설 수 있습니다. 지금 하고 싶은 일은 “이미지 안의 nucleus마다 사각형을 하나씩 만들기”입니다. 그런데 원본 mask는 사람이 보기에는 색으로 구분되어 있지만, YOLO가 바로 읽을 수 있는 형식은 아닙니다.
+이 단계가 조금 낯설 수 있습니다. 지금 하고 싶은 일은 "이미지 안의 nucleus마다 사각형을 하나씩 만들기"입니다.  
+그런데 원본 mask는 사람이 보기에는 색으로 구분되어 있지만 YOLO가 바로 읽을 수 있는 형식은 아닙니다.
 
 그래서 중간에 한 번 더 바꿉니다.
 
@@ -415,7 +420,8 @@ def decode_instance_mask(mask_image):
 
 YOLO는 mask를 직접 읽는 것이 아니라 bounding box label을 읽습니다. 그래서 먼저 mask에서 nucleus object를 구분하고, 각 object를 감싸는 bounding box를 계산해야 합니다.
 
-코드 안의 `color_code`는 RGB 색을 하나의 숫자로 바꾸기 위한 값입니다. 같은 색으로 표시된 pixel을 먼저 찾고, `measure.label()`로 서로 붙어 있는 부분을 nucleus object로 구분합니다. 이 과정이 끝나면 “색으로 된 그림”이 “object 번호가 붙은 숫자 배열”로 바뀝니다.
+코드 안의 `color_code`는 RGB 색을 하나의 숫자로 바꾸기 위한 값입니다. 같은 색으로 표시된 pixel을 먼저 찾고 `measure.label()`로 서로 붙어 있는 부분을 nucleus object로 구분합니다.  
+이 과정이 끝나면 "색으로 된 그림"이 "object 번호가 붙은 숫자 배열"로 바뀝니다.
 
 ## 7단계. TIFF 이미지를 PNG로 변환하는 함수 만들기
 
@@ -574,7 +580,8 @@ print(dataset_summary.head())
 print(dataset_summary.groupby("split")["nucleus_count"].sum())
 ```
 
-이 단계가 프로젝트 5의 핵심입니다. 기존 mask에서 object를 구분하고, object마다 bounding box를 계산한 뒤, YOLO가 읽을 수 있는 TXT label로 저장했습니다. 그래서 bounding box를 손으로 직접 그리지 않아도 학습용 label을 만들 수 있습니다.
+이 단계가 프로젝트 5의 핵심입니다. 기존 mask에서 object를 구분하고 object마다 bounding box를 계산한 뒤, YOLO가 읽을 수 있는 TXT label로 저장했습니다.  
+그래서 bounding box를 손으로 직접 그리지 않아도 학습용 label을 만들 수 있습니다.
 
 여기까지 오면 아직 모델을 학습한 것은 아닙니다. 대신 학습에 필요한 재료를 만든 상태입니다.
 
@@ -586,7 +593,7 @@ print(dataset_summary.groupby("split")["nucleus_count"].sum())
 -> YOLO 학습용 TXT label
 ```
 
-딥러닝 모델은 이 이미지와 label의 짝을 보면서 “이런 모양과 밝기를 가진 부분이 nucleus구나”를 학습합니다.
+딥러닝 모델은 이 이미지와 label의 짝을 보면서 "이런 모양과 밝기를 가진 부분이 nucleus구나"를 학습합니다.
 
 ## 11단계. label preview 저장하기
 
@@ -657,7 +664,8 @@ print("저장된 파일:", preview_path)
 
 ## 12단계. dataset YAML 파일 만들기
 
-Ultralytics YOLO는 학습할 데이터셋 정보를 YAML 파일에서 읽습니다. 이미지와 label 파일을 만들어 두었더라도, YOLO에게 train 이미지가 어디 있고 validation 이미지가 어디 있는지 알려줘야 합니다. 이번 프로젝트에서는 그 설정 파일을 `nuclei.yaml`이라는 이름으로 저장합니다.
+Ultralytics YOLO는 학습할 데이터셋 정보를 YAML 파일에서 읽습니다. 이미지와 label 파일을 만들어 두었더라도 YOLO에게 train 이미지가 어디 있고 validation 이미지가 어디 있는지 알려줘야 합니다.  
+이번 프로젝트에서는 그 설정 파일을 `nuclei.yaml`이라는 이름으로 저장합니다.
 
 ```python
 DATASET_YAML_FILE = YOLO_DATASET_DIR / "nuclei.yaml"
@@ -683,7 +691,7 @@ validation 이미지가 어디 있는지
 class 이름이 무엇인지
 ```
 
-즉, `nuclei.yaml`은 학습 데이터 자체가 아니라 데이터셋의 주소록에 가깝습니다. 이미지와 label 파일은 이미 만들어져 있고, YAML 파일은 YOLO에게 그 파일들이 어디에 있는지 알려줍니다.
+즉 `nuclei.yaml`은 학습 데이터 자체가 아니라 데이터셋의 주소록에 가깝습니다. 이미지와 label 파일은 이미 만들어져 있고 YAML 파일은 YOLO에게 그 파일들이 어디에 있는지 알려줍니다.
 
 ## 13단계. 학습 파라미터 다시 확인하기
 
@@ -719,7 +727,8 @@ TRAIN_IMAGE_COUNT = 20
 DEVICE = "cpu"
 ```
 
-Apple Silicon Mac에서 더 빠르게 실행해보고 싶다면 `DEVICE = "mps"`를 시도할 수 있습니다. 이 설정은 CPU보다 빠르게 학습을 진행할 수 있지만, 환경에 따라 `mps`를 지원하지 않는 경우도 있습니다. 그때는 성능보다 실습 완료를 우선해서 `DEVICE = "cpu"`로 돌아옵니다.
+Apple Silicon Mac에서 더 빠르게 실행해보고 싶다면 `DEVICE = "mps"`를 시도할 수 있습니다. 이 설정은 CPU보다 빠르게 학습을 진행할 수 있지만 환경에 따라 `mps`를 지원하지 않는 경우도 있습니다.  
+그때는 성능보다 실습 완료를 우선해서 `DEVICE = "cpu"`로 돌아옵니다.
 
 ## 14단계. YOLO 모델 학습하기
 
@@ -759,7 +768,8 @@ best_model_path = train_yolo_model()
 print("학습된 모델:", best_model_path)
 ```
 
-처음 실행하면 pretrained 모델 파일을 다운로드한 뒤 학습을 시작합니다. 이 과정은 컴퓨터 사양에 따라 시간이 걸립니다. 프로젝트의 목표는 최고 성능을 내는 것이 아니라, 생명과학 이미지 데이터를 object detection 학습 형식으로 바꾸고 실제 학습까지 이어 보는 것입니다.
+처음 실행하면 pretrained 모델 파일을 다운로드한 뒤 학습을 시작합니다. 이 과정은 컴퓨터 사양에 따라 시간이 걸립니다.  
+프로젝트의 목표는 최고 성능을 내는 것이 아니라 생명과학 이미지 데이터를 object detection 학습 형식으로 바꾸고 실제 학습까지 이어 보는 것입니다.
 
 학습 결과는 다음 폴더에 저장됩니다.
 
@@ -769,9 +779,11 @@ outputs/runs/nuclei_yolo/
 
 그 안의 `weights/best.pt`가 이번 실습에서 학습된 모델 파일입니다.
 
-학습 코드 안의 `patience=3`은 성능이 더 좋아지지 않을 때 너무 오래 기다리지 않도록 하는 값이고, `seed=0`은 실행할 때마다 결과가 크게 흔들리지 않도록 난수의 출발점을 고정하는 값입니다. 둘 다 모델 성능의 정답이라기보다, 실습을 안정적으로 진행하기 위한 설정입니다.
+학습 코드 안의 `patience=3`은 성능이 더 좋아지지 않을 때 너무 오래 기다리지 않도록 하는 값입니다. `seed=0`은 실행할 때마다 결과가 크게 흔들리지 않도록 난수의 출발점을 고정하는 값입니다.  
+둘 다 모델 성능의 정답이라기보다 실습을 안정적으로 진행하기 위한 설정입니다.
 
-작성자처럼 `EPOCHS = 50`으로 바꾸어 실행하더라도 항상 50 epoch를 모두 실행하는 것은 아닙니다. 이 코드에서는 `patience=3`을 함께 사용합니다. validation 성능이 3 epoch 동안 더 좋아지지 않으면 YOLO가 자동으로 학습을 멈추고, 가장 좋았던 모델을 `best.pt`로 저장합니다.
+작성자처럼 `EPOCHS = 50`으로 바꾸어 실행하더라도 항상 50 epoch를 모두 실행하는 것은 아닙니다. 이 코드에서는 `patience=3`을 함께 사용합니다.  
+validation 성능이 3 epoch 동안 더 좋아지지 않으면 YOLO가 자동으로 학습을 멈추고 가장 좋았던 모델을 `best.pt`로 저장합니다.
 
 예를 들어 실제 실행에서 다음과 같은 메시지가 나올 수 있습니다.
 
@@ -782,7 +794,8 @@ Best results observed at epoch 12, best model saved as best.pt.
 
 이것은 에러가 아닙니다. 최대 50 epoch까지 갈 수 있지만, 12 epoch에서 가장 좋은 결과가 나왔고 그 뒤로 3 epoch 동안 더 좋아지지 않아 15 epoch에서 멈춘 것입니다. 불필요하게 오래 돌리지 않고 가장 좋은 모델을 남긴 정상적인 종료입니다.
 
-학습 로그를 보면 어떤 epoch에서는 `mAP50`이 더 높아 보일 수도 있습니다. 하지만 YOLO가 `best.pt`를 고를 때는 `mAP50` 하나만 보지 않고 더 엄격한 지표까지 함께 반영합니다. 그래서 최종적으로는 학습이 끝난 뒤 다시 출력되는 `Validating ... best.pt` 아래의 숫자를 이번 모델의 결과로 보면 됩니다.
+학습 로그를 보면 어떤 epoch에서는 `mAP50`이 더 높아 보일 수도 있습니다. 하지만 YOLO가 `best.pt`를 고를 때는 `mAP50` 하나만 보지 않고 더 엄격한 지표까지 함께 반영합니다.  
+그래서 최종적으로는 학습이 끝난 뒤 다시 출력되는 `Validating ... best.pt` 아래의 숫자를 이번 모델의 결과로 보면 됩니다.
 
 학습 중에는 여러 숫자가 출력됩니다. 처음에는 전부 이해하려고 하기보다, 아래 정도만 보면 충분합니다.
 
@@ -805,9 +818,11 @@ mAP50     0.717
 mAP50-95  0.561
 ```
 
-이 결과는 모델이 nucleus를 완벽하게 찾은 것은 아니지만, 실제로 학습이 진행되었고 validation 이미지에서도 꽤 많은 nucleus를 찾아낸 상태로 볼 수 있습니다. 이 프로젝트는 연구용 모델을 완성하는 과정이 아니라, YOLO용 데이터셋을 만들고 학습과 예측까지 이어 보는 실습이므로 이 정도면 목표에 충분히 맞는 결과입니다.
+이 결과는 모델이 nucleus를 완벽하게 찾은 것은 아니지만 실제로 학습이 진행되었고 validation 이미지에서도 꽤 많은 nucleus를 찾아낸 상태로 볼 수 있습니다.  
+이 프로젝트는 연구용 모델을 완성하는 과정이 아니라 YOLO용 데이터셋을 만들고 학습과 예측까지 이어 보는 실습이므로 이 정도면 목표에 충분히 맞는 결과입니다.
 
-Windows에서 학습 중 multiprocessing 관련 에러가 난다면 Ultralytics Train Docs의 Windows 안내처럼 학습 코드를 `if __name__ == "__main__":` 아래에 두어야 할 수 있습니다. 이 문서의 기본값은 `workers=0`이라 그런 문제를 줄이는 쪽으로 잡았습니다.
+Windows에서 학습 중 multiprocessing 관련 에러가 난다면 Ultralytics Train Docs의 Windows 안내처럼 학습 코드를 `if __name__ == "__main__":` 아래에 두어야 할 수 있습니다.  
+이 문서의 기본값은 `workers=0`이라 그런 문제를 줄이는 쪽으로 잡았습니다.
 
 ## 15단계. validation 이미지에서 예측하기
 
@@ -833,7 +848,8 @@ print("예측한 이미지 수:", len(prediction_results))
 print("예측 이미지 저장 폴더:", OUTPUT_DIR / "predictions" / "val_examples")
 ```
 
-여기서는 모델을 다시 학습하는 것이 아니라, 앞에서 저장된 `best.pt` 모델을 불러와 validation 이미지에 적용합니다. 출력에 `85 nucleuss`처럼 보이는 줄은 해당 이미지에서 YOLO가 nucleus box를 85개 예측했다는 뜻입니다. Ultralytics가 class 이름 뒤에 자동으로 `s`를 붙여 출력하다 보니 `nucleuss`처럼 어색하게 보일 수 있지만, 실행 오류는 아닙니다.
+여기서는 모델을 다시 학습하는 것이 아니라 앞에서 저장된 `best.pt` 모델을 불러와 validation 이미지에 적용합니다. 출력에 `85 nucleuss`처럼 보이는 줄은 해당 이미지에서 YOLO가 nucleus box를 85개 예측했다는 뜻입니다.  
+Ultralytics가 class 이름 뒤에 자동으로 `s`를 붙여 출력하다 보니 `nucleuss`처럼 어색하게 보일 수 있지만 실행 오류는 아닙니다.
 
 예측 이미지는 `outputs/predictions/val_examples/` 폴더에 저장됩니다. 이미지 위에 파란 bounding box와 confidence score가 그려져 있으면 모델이 실제로 어디를 nucleus로 봤는지 눈으로 확인할 수 있습니다.
 
@@ -853,7 +869,8 @@ CONFIDENCE = 0.15
 
 ## 16단계. 실제 nucleus 수와 예측 nucleus 수 비교하기
 
-마지막으로 validation 이미지에서 실제 mask 기반 nucleus 수와 YOLO가 예측한 nucleus 수를 비교합니다. object detection에서는 비교 기준이 되는 label을 ground truth라고 부릅니다. 이미 YOLO label 파일을 만들 때 mask 기반 nucleus 수, 즉 ground truth count를 알고 있으므로 예측 결과의 box 개수와 나란히 놓을 수 있습니다.
+마지막으로 validation 이미지에서 실제 mask 기반 nucleus 수와 YOLO가 예측한 nucleus 수를 비교합니다. object detection에서는 비교 기준이 되는 label을 ground truth라고 부릅니다.  
+이미 YOLO label 파일을 만들 때 mask 기반 nucleus 수, 즉 ground truth count를 알고 있으므로 예측 결과의 box 개수와 나란히 놓을 수 있습니다.
 
 ```python
 ground_truth_counts = {}
@@ -904,7 +921,8 @@ YOLO predicted count 합계: 940
 difference 합계: -130
 ```
 
-`difference`는 `predicted_count - ground_truth_count`입니다. 음수라면 YOLO가 실제 mask 기준보다 적게 찾았다는 뜻이고, 양수라면 더 많이 찾았다는 뜻입니다. 위 결과에서는 전체적으로 nucleus를 조금 덜 잡는 경향이 있지만, validation 이미지마다 예측 개수가 ground truth count와 같은 방향으로 움직이고 있음을 확인할 수 있습니다.
+`difference`는 `predicted_count - ground_truth_count`입니다. 음수라면 YOLO가 실제 mask 기준보다 적게 찾았다는 뜻이고 양수라면 더 많이 찾았다는 뜻입니다.  
+위 결과에서는 전체적으로 nucleus를 조금 덜 잡는 경향이 있지만 validation 이미지마다 예측 개수가 ground truth count와 같은 방향으로 움직이고 있음을 확인할 수 있습니다.
 
 ## 17단계. 개수 비교 그래프 저장하기
 
@@ -1002,7 +1020,8 @@ projects/05_yolo_nuclei_detection/
 
 ## 완성 참고 코드
 
-완성된 참고 코드는 [프로젝트 5 완성 참고 코드](reference_code/05_yolo_nuclei_detection.py)에서 확인할 수 있습니다. 이 참고 코드는 예측 결과가 눈에 보일 정도로 학습되도록 문서의 기본 시작값보다 긴 학습 설정을 사용합니다. 먼저 문서를 따라 직접 입력해 보고, 실행이 잘 되지 않거나 전체 구조를 비교하고 싶을 때 참고하는 것을 권장합니다.
+완성된 참고 코드는 [프로젝트 5 완성 참고 코드](reference_code/05_yolo_nuclei_detection.py)에서 확인할 수 있습니다. 이 참고 코드는 예측 결과가 눈에 보일 정도로 학습되도록 문서의 기본 시작값보다 긴 학습 설정을 사용합니다.  
+먼저 문서를 따라 직접 입력해 보고 실행이 잘 되지 않거나 전체 구조를 비교하고 싶을 때 참고하는 것을 권장합니다.
 
 ## 자주 생기는 문제
 
@@ -1101,4 +1120,4 @@ CONFIDENCE = 0.15
 
 프로젝트 4에서는 mask를 이용해 nucleus를 측정했습니다. 이번 프로젝트에서는 같은 mask에서 bounding box를 만들고, 그 bounding box를 이용해 YOLO object detection 모델을 학습했습니다.
 
-이 프로젝트의 핵심은 좋은 모델을 완성하는 것이 아니라, 생명과학 이미지 데이터를 딥러닝 모델이 학습할 수 있는 형식으로 바꾸고, 학습과 예측까지 이어 보는 것입니다.
+이 프로젝트의 핵심은 좋은 모델을 완성하는 것이 아니라 생명과학 이미지 데이터를 딥러닝 모델이 학습할 수 있는 형식으로 바꾸고 학습과 예측까지 이어 보는 것입니다.

@@ -1,6 +1,6 @@
 # 프로젝트 2. RNA-seq 발현 데이터로 유전자 발현 패턴 보기
 
-실제 공개 RNA-seq 데이터로 유전자 발현값을 sample 정보와 연결하고, 조건별 발현 패턴을 그래프로 확인합니다.
+실제 공개 RNA-seq 데이터로 유전자 발현값을 sample 정보와 연결하고 조건별 발현 패턴을 그래프로 확인합니다.
 
 전체 흐름은 다음과 같습니다.
 
@@ -9,7 +9,7 @@
 3. 비교하기 쉬운 형태로 데이터를 정리합니다.
 4. marker gene의 발현 패턴을 그래프와 heatmap으로 확인합니다.
 
-이 프로젝트를 마치면 sample별 발현 분포 이미지, marker gene 발현 패턴 이미지, heatmap 이미지, 요약 CSV 파일이 만들어집니다.
+이 프로젝트를 마치면 sample별 발현 분포 이미지와 marker gene 발현 패턴 이미지, heatmap 이미지, 요약 CSV 파일이 만들어집니다.
 
 ## 사용할 데이터셋
 
@@ -21,7 +21,7 @@
 - GEO accession: [GSE60450](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE60450)
 - 실습용 CSV 파일: [Melbourne Bioinformatics data.zip](https://github.com/melbournebioinformatics/r-intro-biologists/raw/master/data.zip)
 
-이 데이터셋은 마우스 mammary gland에서 luminal cell과 basal cell을 분리한 뒤, virgin, pregnant, lactating 단계에서 RNA-seq으로 유전자 발현을 측정한 데이터입니다.
+이 데이터셋은 마우스 mammary gland에서 luminal cell과 basal cell을 분리한 뒤 virgin, pregnant, lactating 단계에서 RNA-seq으로 유전자 발현을 측정한 데이터입니다.
 
 GEO 설명에 따르면 전체 sample은 12개입니다. 조건은 cell type과 developmental stage의 조합으로 나뉘고, 각 조건에는 2개의 replicate가 있습니다.
 
@@ -40,13 +40,15 @@ GEO 설명에 따르면 전체 sample은 12개입니다. 조건은 cell type과 
 | `GSE60450_GeneLevel_Normalized(CPM.and.TMM)_data.csv` | gene별 normalized count |
 | `GSE60450_filtered_metadata.csv` | sample별 cell type과 stage 정보 |
 
-여기서 사용하는 발현값은 raw count가 아니라 normalized count입니다. 즉, sample마다 sequencing depth가 다르다는 문제를 어느 정도 보정한 값입니다. 그래서 이 프로젝트에서는 normalization 자체를 새로 계산하지 않고, 이미 정리된 값을 이용해 데이터 모양을 바꾸고 그래프로 보는 데 집중합니다.
+여기서 사용하는 발현값은 raw count가 아니라 normalized count입니다. 즉 sample마다 sequencing depth가 다르다는 문제를 어느 정도 보정한 값입니다.  
+그래서 이 프로젝트에서는 normalization 자체를 새로 계산하지 않고 이미 정리된 값을 이용해 데이터 모양을 바꾸고 그래프로 보는 데 집중합니다.
 
 ## 작업 파일 만들기
 
 먼저 `projects/02_rnaseq_expression_patterns/` 폴더를 만들고, 그 안에 `analysis.py` 파일을 만듭니다.
 
-이 프로젝트는 프로젝트 1을 마친 뒤 진행한다고 가정합니다. CSV 파일을 불러오고, 그래프를 저장하고, 폴더를 만드는 흐름은 길게 반복해서 설명하지 않습니다. 대신 이번에 새로 나오는 `metadata`, `wide format`, `long format`, `merge`, `log2`, `heatmap`을 중심으로 봅니다.
+이 프로젝트는 프로젝트 1을 마친 뒤 진행한다고 가정합니다. CSV 파일을 불러오고 그래프를 저장하며 폴더를 만드는 흐름은 길게 반복해서 설명하지 않습니다.  
+대신 이번에 새로 나오는 `metadata`, `wide format`, `long format`, `merge`, `log2`, `heatmap`을 중심으로 봅니다.
 
 진행을 마치면 아래와 같은 구조가 됩니다.
 
@@ -149,7 +151,7 @@ print("metadata 파일:", METADATA_FILE)
 
 ZIP 파일은 여러 파일을 하나로 묶어 둔 압축 파일입니다. 여기서는 ZIP 안에 있는 두 CSV 파일만 `data/raw/` 폴더로 꺼냅니다.
 
-`files_to_extract`는 “ZIP 안에서의 파일 이름”과 “내 컴퓨터에 저장할 파일 위치”를 짝지어 둔 딕셔너리입니다.
+`files_to_extract`는 "ZIP 안에서의 파일 이름"과 "내 컴퓨터에 저장할 파일 위치"를 짝지어 둔 딕셔너리입니다.
 
 이렇게 적어두면 ZIP 안에 여러 파일이 있어도, 필요한 파일만 골라 원하는 위치에 저장할 수 있습니다.
 
@@ -174,7 +176,7 @@ print(metadata.head())
 
 `metadata`에는 sample 설명이 들어 있습니다. 측정값 자체가 아니라, 각 sample이 어떤 cell type이고 어떤 developmental stage인지 알려주는 표입니다.
 
-생명과학 데이터에서는 이런 식으로 “실험값 표”와 “sample 설명 표”가 따로 있는 경우가 많습니다.
+생명과학 데이터에서는 이런 식으로 "실험값 표"와 "sample 설명 표"가 따로 있는 경우가 많습니다.
 
 ```text
 발현값 데이터: gene별 count 값
@@ -264,9 +266,9 @@ Gnai3       | 243.28596  | 255.66037  | 239.73819  | ...
 Cdc45       | 11.18453   | 13.78314   | 11.60091   | ...
 ```
 
-사람이 표를 넓게 훑어볼 때는 wide format이 편할 수 있습니다. 하지만 “이 gene이 각 조건에서 얼마나 발현되는가”를 그리려면 sample 이름이 하나의 열로 들어가 있어야 조건 정보와 연결하기 쉽습니다.
+사람이 표를 넓게 훑어볼 때는 wide format이 편할 수 있습니다. 하지만 "이 gene이 각 조건에서 얼마나 발현되는가"를 그리려면 sample 이름이 하나의 열로 들어가 있어야 조건 정보와 연결하기 쉽습니다.
 
-long format은 “한 행에 하나의 측정값”이 들어가는 형태입니다.
+long format은 "한 행에 하나의 측정값"이 들어가는 형태입니다.
 
 ```text
 gene_symbol | Sample     | Count
@@ -296,11 +298,11 @@ print(long_counts.head())
 - `var_name`: 원래 열 이름이 들어갈 새 열 이름입니다. 여기서는 sample 이름이 들어가므로 `Sample`로 정합니다.
 - `value_name`: 실제 값이 들어갈 새 열 이름입니다. 여기서는 발현값이 들어가므로 `Count`로 정합니다.
 
-이제 각 행은 “어떤 gene이 어떤 sample에서 얼마만큼 발현되었는지”를 나타냅니다. 아직 조건 정보는 붙어 있지 않고, sample 이름만 들어 있습니다.
+이제 각 행은 "어떤 gene이 어떤 sample에서 얼마만큼 발현되었는지"를 나타냅니다. 아직 조건 정보는 붙어 있지 않고 sample 이름만 들어 있습니다.
 
 ## 8단계. 발현값 데이터와 metadata 합치기
 
-`long_counts`에는 발현값이 있고, `metadata`에는 sample 설명이 있습니다. 발현값만 있으면 조건을 알 수 없고, metadata만 있으면 gene별 발현값을 알 수 없습니다.
+`long_counts`에는 발현값이 있고 `metadata`에는 sample 설명이 있습니다. 발현값만 있으면 조건을 알 수 없고 metadata만 있으면 gene별 발현값을 알 수 없습니다.
 
 두 표는 `Sample` 열을 공통으로 가지고 있습니다.
 
@@ -319,7 +321,7 @@ print(expression.head())
 
 `merge()`는 두 표를 연결하는 기능입니다.
 
-여기서는 `on="Sample"`이라고 했습니다. 즉, 같은 sample 이름을 가진 행끼리 연결합니다.
+여기서는 `on="Sample"`이라고 했습니다. 즉 같은 sample 이름을 가진 행끼리 연결합니다.
 
 ```text
 발현값 표의 Sample
@@ -347,7 +349,7 @@ RNA-seq 발현값은 작은 값부터 매우 큰 값까지 범위가 넓습니�
 print(expression["Count"].describe(percentiles=[0.5, 0.9, 0.99]))
 ```
 
-이런 표에서는 최솟값, 중앙값, 큰 값 쪽의 범위를 함께 볼 수 있습니다. 값의 범위가 넓게 벌어져 있으면 그래프에서 작은 차이가 잘 보이지 않을 수 있습니다.
+이런 표에서는 최솟값과 중앙값, 큰 값 쪽의 범위를 함께 볼 수 있습니다. 값의 범위가 넓게 벌어져 있으면 그래프에서 작은 차이가 잘 보이지 않을 수 있습니다.
 
 그래서 발현값을 `log2(count + 1)`로 바꿔 봅니다.
 
@@ -409,9 +411,10 @@ boxplot은 값의 분포를 요약해서 보여주는 그래프입니다. sample
 
 전체 gene을 한 번에 그래프로 그리면 너무 많아서 처음에는 읽기 어렵습니다. 그래서 먼저 발현 패턴을 살펴보기 좋은 gene 몇 개를 작은 목록으로 고릅니다.
 
-여기서는 새로운 marker를 찾아내는 분석까지 진행하지 않고, mammary gland와 epithelial cell 문맥에서 자주 언급되는 gene들을 예시로 사용합니다. lactation과 관련된 gene, basal cell 쪽에서 자주 쓰이는 keratin gene, luminal cell과 관련해 자주 등장하는 gene을 함께 넣어 조건별 발현 패턴을 그려 봅니다.
+여기서는 새로운 marker를 찾아내는 분석까지 진행하지 않고 mammary gland와 epithelial cell 문맥에서 자주 언급되는 gene들을 예시로 사용합니다.  
+lactation과 관련된 gene, basal cell 쪽에서 자주 쓰이는 keratin gene, luminal cell과 관련해 자주 등장하는 gene을 함께 넣어 조건별 발현 패턴을 그려 봅니다.
 
-즉, 아래 목록은 이 데이터에서 새로 찾아낸 marker 목록이 아니라, 발현값을 조건별로 꺼내고 그리는 과정을 연습하기 위한 출발점입니다.
+즉 아래 목록은 이 데이터에서 새로 찾아낸 marker 목록이 아니라, 발현값을 조건별로 꺼내고 그리는 과정을 연습하기 위한 출발점입니다.
 
 ```python
 marker_genes = [
@@ -473,7 +476,7 @@ markers["gene_symbol"] = pd.Categorical(
 
 문자열은 기본적으로 가나다순이나 알파벳순으로 정렬될 수 있습니다. 하지만 생명과학 데이터에서는 원하는 순서가 따로 있는 경우가 많습니다.
 
-여기서는 luminal 조건 3개를 먼저 보고, 그다음 basal 조건 3개를 보도록 순서를 정했습니다. 같은 cell type 안에서는 virgin, pregnant, lactating 순서로 배치합니다.
+여기서는 luminal 조건 3개를 먼저 보고 그다음 basal 조건 3개를 보도록 순서를 정했습니다. 같은 cell type 안에서는 virgin, pregnant, lactating 순서로 배치합니다.
 
 ## 13단계. marker gene 발현 패턴 그리기
 
@@ -580,7 +583,7 @@ print(pd.read_csv(summary_path).head())
 
 마지막으로 marker gene의 조건별 평균 발현값을 heatmap으로 그립니다. scatter plot은 gene마다 작은 그래프를 따로 보기에 좋고, heatmap은 여러 gene과 여러 조건을 한 화면에서 비교하기에 좋습니다.
 
-heatmap은 숫자를 색으로 표현한 표입니다. 행은 gene, 열은 조건이고, 색을 통해 발현값의 크기를 구분할 수 있습니다.
+heatmap은 숫자를 색으로 표현한 표입니다. 행은 gene, 열은 조건이고 색을 통해 발현값의 크기를 구분할 수 있습니다.
 
 먼저 heatmap에 넣을 표를 만듭니다.
 
@@ -680,7 +683,7 @@ projects/02_rnaseq_expression_patterns/outputs/
 
 ## 완성 참고 코드
 
-완성된 참고 코드는 [프로젝트 2 완성 참고 코드](reference_code/02_rnaseq_expression_patterns.py)에서 확인할 수 있습니다. 먼저 문서를 따라 직접 입력해 보고, 실행이 잘 되지 않거나 전체 구조를 비교하고 싶을 때 참고하는 것을 권장합니다.
+완성된 참고 코드는 [프로젝트 2 완성 참고 코드](reference_code/02_rnaseq_expression_patterns.py)에서 확인할 수 있습니다. 먼저 문서를 따라 직접 입력해 보고 실행이 잘 되지 않거나 전체 구조를 비교하고 싶을 때 참고하는 것을 권장합니다.
 
 ## 자주 생기는 문제
 

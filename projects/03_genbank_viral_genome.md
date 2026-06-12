@@ -1,6 +1,6 @@
 # 프로젝트 3. GenBank 파일로 바이러스 유전체 구조 살펴보기
 
-실제 공개 바이러스 reference genome을 내려받아, 서열과 annotation을 함께 살펴봅니다.
+실제 공개 바이러스 reference genome을 내려받아 서열과 annotation을 함께 살펴봅니다.
 
 전체 흐름은 다음과 같습니다.
 
@@ -9,7 +9,7 @@
 3. CDS 위치를 표와 genome map으로 정리합니다.
 4. genome의 GC content 변화를 보고, spike sequence를 꺼내 활용합니다.
 
-이 프로젝트를 마치면 바이러스 genome feature 표, genome map 이미지, GC content profile 이미지, spike sequence FASTA 파일, motif 위치 CSV 파일이 만들어집니다.
+이 프로젝트를 마치면 바이러스 genome feature 표와 genome map 이미지, GC content profile 이미지, spike sequence FASTA 파일, motif 위치 CSV 파일이 만들어집니다.
 
 ## 사용할 데이터셋
 
@@ -50,13 +50,13 @@ FEATURES
                   /product="surface glycoprotein"
 ```
 
-프로젝트 1, 2가 표 데이터를 다루는 연습이었다면, 이번 프로젝트는 생명정보학에서 자주 만나는 서열 파일을 직접 읽고 활용하는 연습입니다.
+프로젝트 1, 2가 표 데이터를 다루는 연습이었다면 이번 프로젝트는 생명정보학에서 자주 만나는 서열 파일을 직접 읽고 활용하는 연습입니다.
 
 ## 작업 파일 만들기
 
 먼저 `projects/03_genbank_viral_genome/` 폴더를 만들고, 그 안에 `analysis.py` 파일을 만듭니다.
 
-이번에는 `Biopython`이라는 생명정보학용 Python 라이브러리를 사용합니다. CSV 파일을 다룰 때 `pandas`를 사용했던 것처럼, FASTA나 GenBank 같은 생명정보학 파일을 다룰 때는 `Biopython`을 자주 사용합니다.
+이번에는 `Biopython`이라는 생명정보학용 Python 라이브러리를 사용합니다. CSV 파일을 다룰 때 `pandas`를 사용했던 것처럼 FASTA나 GenBank 같은 생명정보학 파일을 다룰 때는 `Biopython`을 자주 사용합니다.
 
 진행을 마치면 아래와 같은 구조가 됩니다.
 
@@ -184,7 +184,7 @@ print("feature 수:", len(record.features))
 
 ## 5단계. 염기 조성과 GC content 계산하기
 
-annotation을 보기 전에, 먼저 genome sequence 자체를 간단히 확인합니다. A, C, G, T가 각각 몇 번 나오는지 계산합니다.
+annotation을 보기 전에 먼저 genome sequence 자체를 간단히 확인합니다. A, C, G, T가 각각 몇 번 나오는지 계산합니다.
 
 ```python
 genome_seq = record.seq.upper()
@@ -209,7 +209,7 @@ GC content는 전체 염기 중 G와 C가 차지하는 비율입니다.
 GC content = (G 개수 + C 개수) / 전체 염기 수 * 100
 ```
 
-GenBank record에는 `ss-RNA`라고 적혀 있지만, FASTA나 GenBank 파일에서는 보통 `U` 대신 `T`로 표시된 서열을 다룹니다. 그래서 여기서도 A, C, G, T를 기준으로 계산합니다.
+GenBank record에는 `ss-RNA`라고 적혀 있지만 FASTA나 GenBank 파일에서는 보통 `U` 대신 `T`로 표시된 서열을 다룹니다. 그래서 여기서도 A, C, G, T를 기준으로 계산합니다.
 
 ## 6단계. GenBank feature 종류 확인하기
 
@@ -225,7 +225,7 @@ CDS
 mat_peptide
 ```
 
-어떤 annotation을 사용할 수 있는지 알아보기 위해, 먼저 feature 종류가 얼마나 들어 있는지 확인합니다.
+어떤 annotation을 사용할 수 있는지 알아보기 위해 먼저 feature 종류가 얼마나 들어 있는지 확인합니다.
 
 ```python
 feature_type_counts = {}
@@ -243,7 +243,7 @@ CDS는 coding sequence의 줄임말입니다. 단백질로 번역되는 nucleoti
 
 ## 7단계. CDS 정보를 표로 정리하기
 
-CDS를 중심으로 보기로 했으니, 이제 CDS feature에서 gene 이름, product, 위치, 길이 정보를 꺼냅니다. 이 표를 만들면 genome map을 그릴 때도, 특정 gene을 찾을 때도 같은 정보를 사용할 수 있습니다.
+CDS를 중심으로 보기로 했으니 이제 CDS feature에서 gene 이름과 product, 위치, 길이 정보를 꺼냅니다. 이 표를 만들면 genome map을 그릴 때도 특정 gene을 찾을 때도 같은 정보를 사용할 수 있습니다.
 
 ```python
 def get_first_value(qualifiers, key, default=""):
@@ -310,7 +310,7 @@ Python index: 0부터 시작
 
 ## 8단계. CDS 표 저장하기
 
-정리한 CDS 표를 CSV 파일로 저장합니다. 서열 파일 안에 있던 annotation을 표로 꺼내 두면, 엑셀이나 다른 분석 도구에서도 이어서 다룰 수 있습니다.
+정리한 CDS 표를 CSV 파일로 저장합니다. 서열 파일 안에 있던 annotation을 표로 꺼내 두면 엑셀이나 다른 분석 도구에서도 이어서 다룰 수 있습니다.
 
 ```python
 features_path = OUTPUT_DIR / "genome_features.csv"
@@ -320,11 +320,11 @@ print("저장된 파일:", features_path)
 print(pd.read_csv(features_path).head())
 ```
 
-이 파일에는 각 CDS의 gene 이름, product, genome 위치, 길이 정보가 들어 있습니다.
+이 파일에는 각 CDS의 gene 이름과 product, genome 위치, 길이 정보가 들어 있습니다.
 
 ## 9단계. genome map 그리기
 
-CDS 표에는 `start`와 `end`가 숫자로 들어 있습니다. 숫자 표만으로도 정보를 확인할 수 있지만, genome 위에서 어떤 순서로 놓이는지는 그림으로 보는 편이 훨씬 쉽습니다.
+CDS 표에는 `start`와 `end`가 숫자로 들어 있습니다. 숫자 표만으로도 정보를 확인할 수 있지만 genome 위에서 어떤 순서로 놓이는지는 그림으로 보는 편이 훨씬 쉽습니다.
 
 이번에는 CDS 위치를 genome 위에 막대처럼 표시합니다.
 
@@ -411,7 +411,7 @@ def calculate_gc_percent(sequence):
     return gc_count / len(sequence) * 100
 ```
 
-이제 500 bp 크기의 창을 100 bp씩 움직이면서 GC content를 계산합니다. 이 두 값은 위치별 변화를 보기 위한 출발값입니다. window를 크게 잡으면 선이 더 부드러워지고, 작게 잡으면 더 세밀하게 보이지만 값이 더 흔들릴 수 있습니다.
+이제 500 bp 크기의 창을 100 bp씩 움직이면서 GC content를 계산합니다. 이 두 값은 위치별 변화를 보기 위한 출발값입니다. window를 크게 잡으면 선이 더 부드러워지고 작게 잡으면 더 세밀하게 보이지만 값이 더 흔들릴 수 있습니다.
 
 ```python
 window_size = 500
@@ -491,7 +491,7 @@ print("product:", get_first_value(spike_feature.qualifiers, "product"))
 
 여기서는 `gene` 값이 `S`인 CDS를 찾았습니다.
 
-GenBank annotation을 사용하면 좌표를 직접 외우지 않아도, 원하는 gene의 위치를 코드로 찾아낼 수 있습니다.
+GenBank annotation을 사용하면 좌표를 직접 외우지 않아도 원하는 gene의 위치를 코드로 찾아낼 수 있습니다.
 
 ## 13단계. spike nucleotide sequence 꺼내기
 
@@ -556,7 +556,7 @@ FASTA 파일은 서열을 저장하고 공유할 때 많이 쓰입니다.
 
 ## 16단계. spike protein에서 짧은 motif 찾기
 
-마지막으로 spike protein sequence에서 짧은 amino acid motif가 어디에 있는지 찾아봅니다. 서열을 꺼냈다면 가장 간단하게 해볼 수 있는 활용 중 하나가 “긴 서열 안에서 특정 짧은 서열을 찾기”입니다.
+마지막으로 spike protein sequence에서 짧은 amino acid motif가 어디에 있는지 찾아봅니다. 서열을 꺼냈다면 가장 간단하게 해볼 수 있는 활용 중 하나가 "긴 서열 안에서 특정 짧은 서열을 찾기"입니다.
 
 이 단계에서는 복잡한 alignment를 하지 않고, 긴 문자열 안에서 짧은 문자열의 위치를 찾는 방식만 사용합니다.
 
@@ -635,7 +635,7 @@ projects/03_genbank_viral_genome/outputs/
 
 ## 완성 참고 코드
 
-완성된 참고 코드는 [프로젝트 3 완성 참고 코드](reference_code/03_genbank_viral_genome.py)에서 확인할 수 있습니다. 먼저 문서를 따라 직접 입력해 보고, 실행이 잘 되지 않거나 전체 구조를 비교하고 싶을 때 참고하는 것을 권장합니다.
+완성된 참고 코드는 [프로젝트 3 완성 참고 코드](reference_code/03_genbank_viral_genome.py)에서 확인할 수 있습니다. 먼저 문서를 따라 직접 입력해 보고 실행이 잘 되지 않거나 전체 구조를 비교하고 싶을 때 참고하는 것을 권장합니다.
 
 ## 자주 생기는 문제
 
@@ -677,6 +677,6 @@ for feature in record.features:
 10. protein sequence에서 motif 위치 찾기
 ```
 
-프로젝트 1, 2에서는 표 형태의 실험 데이터를 중심으로 다뤘습니다. 이번에는 서열과 annotation이 함께 들어 있는 GenBank 파일을 읽고, genome 구조와 특정 gene sequence를 직접 꺼내 보았습니다.
+프로젝트 1, 2에서는 표 형태의 실험 데이터를 중심으로 다뤘습니다. 이번에는 서열과 annotation이 함께 들어 있는 GenBank 파일을 읽고 genome 구조와 특정 gene sequence를 직접 꺼내 보았습니다.
 
-이 흐름은 바이러스 genome뿐 아니라 plasmid, bacterial genome, mitochondrial genome처럼 annotation이 붙어 있는 다른 서열 데이터에도 비슷하게 적용할 수 있습니다.
+이 흐름은 바이러스 genome뿐 아니라 plasmid와 bacterial genome, mitochondrial genome처럼 annotation이 붙어 있는 다른 서열 데이터에도 비슷하게 적용할 수 있습니다.

@@ -1,15 +1,15 @@
 # 프로젝트 4. 현미경 이미지에서 세포핵 측정하기
 
-실제 공개 형광 현미경 이미지와 nucleus mask를 사용해, 이미지 속 세포핵의 개수와 크기, 밝기를 측정합니다.
+실제 공개 형광 현미경 이미지와 nucleus mask를 사용해 이미지 속 세포핵의 개수와 크기, 밝기를 측정합니다.
 
 전체 흐름은 다음과 같습니다.
 
 1. 공개 현미경 이미지와 nucleus mask를 내려받습니다.
-2. 이미지를 숫자 배열로 읽고, mask와 어떻게 대응되는지 확인합니다.
+2. 이미지를 숫자 배열로 읽고 mask와 어떻게 대응되는지 확인합니다.
 3. mask를 이용해 nucleus별 측정값을 계산합니다.
 4. 여러 이미지의 측정 결과를 표와 그래프로 정리합니다.
 
-이 프로젝트를 마치면 정규화한 예시 이미지, nucleus overlay 이미지, bounding box 이미지, nucleus별 측정 CSV, 이미지별 요약 CSV, 분포 그래프들이 만들어집니다.
+이 프로젝트를 마치면 정규화한 예시 이미지와 nucleus overlay 이미지, bounding box 이미지, nucleus별 측정 CSV, 이미지별 요약 CSV, 분포 그래프들이 만들어집니다.
 
 ## 사용할 데이터셋
 
@@ -24,7 +24,7 @@
 - metadata 파일: [metadata.zip](https://data.broadinstitute.org/bbbc/BBBC039/metadata.zip)
 - 라이선스: CC0
 
-BBBC039는 U2OS 세포의 핵을 Hoechst stain으로 촬영한 형광 현미경 이미지 데이터셋입니다. BBBC 설명에 따르면 총 200개의 field of view가 있고, 이미지는 520 x 696 pixel, 16-bit TIFF 형식입니다.
+BBBC039는 U2OS 세포의 핵을 Hoechst stain으로 촬영한 형광 현미경 이미지 데이터셋입니다. BBBC 설명에 따르면 총 200개의 field of view가 있고 이미지는 520 x 696 pixel, 16-bit TIFF 형식입니다.
 
 이 데이터셋에는 원본 이미지뿐 아니라 nucleus mask도 함께 들어 있습니다. mask는 이미지에서 어디가 nucleus인지 표시해 둔 annotation입니다.
 
@@ -34,13 +34,13 @@ BBBC039는 U2OS 세포의 핵을 Hoechst stain으로 촬영한 형광 현미경 
 | `masks.zip` | 약 2.8 MB | nucleus mask PNG 이미지 |
 | `metadata.zip` | 약 18 KB | 이미지 목록과 train/validation/test 구분 |
 
-이번 프로젝트에서는 segmentation 모델을 새로 만들지는 않습니다. 이미 제공된 mask를 사용해, 이미지 안의 nucleus를 어떻게 측정하고 표로 정리하는지에 집중합니다.
+이번 프로젝트에서는 segmentation 모델을 새로 만들지는 않습니다. 이미 제공된 mask를 사용해 이미지 안의 nucleus를 어떻게 측정하고 표로 정리하는지에 집중합니다.
 
 ## 작업 파일 만들기
 
 먼저 `projects/04_microscopy_nuclei_measurement/` 폴더를 만들고, 그 안에 `analysis.py` 파일을 만듭니다.
 
-프로젝트 1, 2에서는 표 데이터를 다뤘고, 프로젝트 3에서는 서열 파일을 다뤘습니다. 이번에는 생명과학에서 자주 만나는 이미지 데이터를 다룹니다.
+프로젝트 1, 2에서는 표 데이터를 다뤘고 프로젝트 3에서는 서열 파일을 다뤘습니다. 이번에는 생명과학에서 자주 만나는 이미지 데이터를 다룹니다.
 
 진행을 마치면 아래와 같은 구조가 됩니다.
 
@@ -89,7 +89,7 @@ from skimage import exposure, io, measure, segmentation
 
 - `io`: TIFF, PNG 같은 이미지 파일을 읽습니다.
 - `exposure`: 이미지 intensity 범위를 보기 좋게 조정합니다.
-- `measure`: mask에서 object를 찾고 면적, 중심 좌표, 밝기 같은 값을 측정합니다.
+- `measure`: mask에서 object를 찾고 면적과 중심 좌표, 밝기 같은 값을 측정합니다.
 - `segmentation`: mask의 경계선을 찾을 때 사용합니다.
 - `Rectangle`: 이미지 위에 bounding box를 그릴 때 사용합니다.
 
@@ -123,7 +123,7 @@ print("출력 폴더:", OUTPUT_DIR)
 
 ## 3단계. 데이터 다운로드하기
 
-BBBC039에서 이미지, mask, metadata ZIP 파일을 다운로드합니다.
+BBBC039에서 이미지와 mask, metadata ZIP 파일을 다운로드합니다.
 
 ```python
 DOWNLOADS = {
@@ -147,7 +147,7 @@ for filename, url in DOWNLOADS.items():
 
 ## 4단계. 압축 풀기
 
-다운로드한 ZIP 파일을 풉니다. 압축을 푼 뒤에는 이미지, mask, metadata 파일이 실제로 들어왔는지도 함께 확인합니다.
+다운로드한 ZIP 파일을 풉니다. 압축을 푼 뒤에는 이미지와 mask, metadata 파일이 실제로 들어왔는지도 함께 확인합니다.
 
 ```python
 def extract_zip(zip_path, output_dir):
@@ -189,11 +189,12 @@ print("첫 번째 mask 파일:", mask_files[0].name)
 
 ZIP 파일 안에는 macOS에서 생긴 보조 파일이 함께 들어 있을 수 있습니다. `__MACOSX/`로 시작하는 파일은 분석에 필요하지 않으므로 건너뜁니다.
 
-이미지 파일은 `.tif`, mask 파일은 `.png` 형식입니다. 파일 수와 첫 파일 이름을 확인해 두면, 이후 단계에서 이미지와 mask를 제대로 짝지었는지 확인하기 쉽습니다.
+이미지 파일은 `.tif`, mask 파일은 `.png` 형식입니다. 파일 수와 첫 파일 이름을 확인해 두면 이후 단계에서 이미지와 mask를 제대로 짝지었는지 확인하기 쉽습니다.
 
 ## 5단계. 분석할 이미지 목록 고르기
 
-BBBC039에는 여러 이미지가 들어 있습니다. 처음에는 metadata 안의 training 목록에서 20개만 골라, 이미지 한 장에서 만든 측정 과정을 여러 장에 적용해 봅니다. `20`은 특별한 생물학적 기준이 아니라, 처음 실행할 때 처리 시간과 결과 파일 크기를 적당하게 유지하기 위한 값입니다.
+BBBC039에는 여러 이미지가 들어 있습니다. 처음에는 metadata 안의 training 목록에서 20개만 골라 이미지 한 장에서 만든 측정 과정을 여러 장에 적용해 봅니다.  
+`20`은 특별한 생물학적 기준이 아니라 처음 실행할 때 처리 시간과 결과 파일 크기를 적당하게 유지하기 위한 값입니다.
 
 ```python
 training_list_path = METADATA_DIR / "training.txt"
@@ -228,7 +229,7 @@ mask:  IXMtest_A06_... .png
 
 ## 6단계. 현미경 이미지 읽기
 
-먼저 첫 번째 이미지를 읽어 봅니다. 이미지 분석에서는 파일을 읽자마자 크기, 자료형, intensity 범위를 확인하는 습관이 중요합니다.
+먼저 첫 번째 이미지를 읽어 봅니다. 이미지 분석에서는 파일을 읽자마자 크기와 자료형, intensity 범위를 확인하는 습관이 중요합니다.
 
 ```python
 example_image_name = selected_image_names[0]
@@ -304,7 +305,8 @@ print("mask의 세로, 가로:", mask_image.shape[:2])
 
 BBBC039의 mask는 PNG 파일입니다. 배경은 검은색이고, nucleus 영역은 색으로 표시되어 있습니다.
 
-mask는 원본 이미지와 같은 세로, 가로 크기를 가집니다. PNG mask는 색 정보를 담고 있어서 출력되는 `shape`에 색 채널이 함께 보일 수 있지만, 앞의 두 값이 원본 이미지의 세로, 가로와 같으면 같은 위치의 pixel끼리 대응됩니다.
+mask는 원본 이미지와 같은 세로, 가로 크기를 가집니다. PNG mask는 색 정보를 담고 있어서 출력되는 `shape`에 색 채널이 함께 보일 수 있습니다.  
+다만 앞의 두 값이 원본 이미지의 세로, 가로와 같으면 같은 위치의 pixel끼리 대응됩니다.
 
 ```text
 원본 이미지: 520 x 696
@@ -399,7 +401,7 @@ print("저장된 파일:", overlay_path)
 
 ## 11단계. nucleus별 측정값 계산하기
 
-이제 각 nucleus의 면적, 중심 좌표, bounding box, 평균 밝기를 측정합니다. label image는 “어디가 같은 nucleus인지”를 알려주고, 원본 이미지는 “그 nucleus 영역의 밝기가 얼마인지”를 알려줍니다.
+이제 각 nucleus의 면적과 중심 좌표, bounding box, 평균 밝기를 측정합니다. label image는 "어디가 같은 nucleus인지"를 알려주고 원본 이미지는 "그 nucleus 영역의 밝기가 얼마인지"를 알려줍니다.
 
 ```python
 properties = measure.regionprops_table(
@@ -489,7 +491,7 @@ segmentation mask는 object의 모양을 pixel 단위로 표시하고, bounding 
 
 ## 13단계. 여러 이미지 반복 처리하기
 
-첫 번째 이미지에서 읽기, mask 변환, boundary 확인, 측정까지 해봤습니다. 이제 같은 과정을 선택한 20개 이미지에 반복합니다.
+첫 번째 이미지에서 읽기와 mask 변환, boundary 확인, 측정까지 해봤습니다. 이제 같은 과정을 선택한 20개 이미지에 반복합니다.
 
 ```python
 def measure_nuclei_in_image(image_name, mask_name):
@@ -590,7 +592,7 @@ print("저장된 파일:", nuclei_measurements_path)
 print(pd.read_csv(nuclei_measurements_path).head())
 ```
 
-이 파일은 nucleus 하나를 한 행으로 가지는 표입니다. 이후에 면적 분포, 밝기 분포, 이미지별 요약을 만들 때 이 표를 사용합니다.
+이 파일은 nucleus 하나를 한 행으로 가지는 표입니다. 이후에 면적 분포와 밝기 분포, 이미지별 요약을 만들 때 이 표를 사용합니다.
 
 ## 16단계. 이미지별 요약표 만들기
 
@@ -732,7 +734,7 @@ projects/04_microscopy_nuclei_measurement/outputs/
 
 ## 완성 참고 코드
 
-완성된 참고 코드는 [프로젝트 4 완성 참고 코드](reference_code/04_microscopy_nuclei_measurement.py)에서 확인할 수 있습니다. 먼저 문서를 따라 직접 입력해 보고, 실행이 잘 되지 않거나 전체 구조를 비교하고 싶을 때 참고하는 것을 권장합니다.
+완성된 참고 코드는 [프로젝트 4 완성 참고 코드](reference_code/04_microscopy_nuclei_measurement.py)에서 확인할 수 있습니다. 먼저 문서를 따라 직접 입력해 보고 실행이 잘 되지 않거나 전체 구조를 비교하고 싶을 때 참고하는 것을 권장합니다.
 
 ## 자주 생기는 문제
 
@@ -773,6 +775,6 @@ print(example_mask_name)
 9. 면적 분포, 밝기 분포, 이미지별 nucleus 개수 그래프 저장하기
 ```
 
-프로젝트 4에서는 이미지가 숫자 배열이라는 점, mask가 object를 구분하는 방식, 그리고 object별 측정값을 표로 만드는 흐름을 다뤘습니다.
+프로젝트 4에서는 이미지가 숫자 배열이라는 점과 mask가 object를 구분하는 방식, object별 측정값을 표로 만드는 흐름을 다뤘습니다.
 
-이 흐름은 세포핵뿐 아니라 세포, colony, organoid, tissue region처럼 이미지 안의 object를 측정해야 하는 다른 생명과학 이미지 데이터에도 비슷하게 적용할 수 있습니다.
+이 흐름은 세포핵뿐 아니라 세포와 colony, organoid, tissue region처럼 이미지 안의 object를 측정해야 하는 다른 생명과학 이미지 데이터에도 비슷하게 적용할 수 있습니다.
