@@ -24,7 +24,7 @@
 ## 프로젝트 목록
 
 | 번호 | 프로젝트 |
-| --- | --- |
+| :--: | --- |
 | 1 | [세균 성장 곡선 분석하기](01_bacterial_growth_curve.md) |
 | 2 | [RNA-seq 발현 데이터로 유전자 발현 패턴 보기](02_rnaseq_expression_patterns.md) |
 | 3 | [GenBank 파일로 바이러스 유전체 구조 살펴보기](03_genbank_viral_genome.md) |
@@ -53,7 +53,7 @@
 ## 프로젝트별 데이터
 
 | 프로젝트 | 공개 데이터셋 | 데이터 형태 |
-| --- | --- | --- |
+| :--: | --- | --- |
 | 1 | [Bacterial bioindicators growth curves](https://figshare.com/articles/dataset/Bacterial_bioindicators_growth_curves/28684982) | bacterial growth curve CSV |
 | 2 | [GSE60450](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE60450) | RNA-seq normalized count CSV, metadata CSV |
 | 3 | [NCBI Nucleotide NC_045512.2](https://www.ncbi.nlm.nih.gov/nuccore/1798174254) | GenBank, FASTA |
